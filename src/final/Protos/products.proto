@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/type/money.proto";
+
+option csharp_namespace = "GrpcGeneratedClasses";
+
+service Products {
+  rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
+}
+
+message CreateProductRequest{
+  string name = 1;
+  google.type.Money price = 2;
+}
+
+message CreateProductResponse{
+  int64 id = 1;
+}

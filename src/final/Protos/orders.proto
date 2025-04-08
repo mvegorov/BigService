@@ -1,0 +1,102 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "GrpcGeneratedClasses";
+
+service Orders {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+  rpc AddProductToOrder(AddProductToOrderRequest) returns (AddProductToOrderResponse);
+  rpc RemoveProductFromOrder(RemoveProductFromOrderRequest) returns (RemoveProductFromOrderResponse);
+  rpc UpdateOrderState(UpdateOrderStateRequest) returns (UpdateOrderStateResponse);
+  rpc GetOrderHistory(GetOrderHistoryRequest) returns (stream OrderHistoryEntry);
+  rpc GetFullOrderHistory(GetFullOrderHistoryRequest) returns (stream OrderHistoryEntry);
+}
+
+message CreateOrderRequest{
+  string created_by = 1;
+}
+
+message CreateOrderResponse{
+  int64 id = 1;
+}
+
+message AddProductToOrderRequest {
+  int64 orderId = 1;
+  int64 productId = 2;
+  int32 quantity = 3;
+}
+
+message AddProductToOrderResponse {
+  string message = 1;
+}
+
+message RemoveProductFromOrderRequest {
+  int64 orderId = 1;
+  int64 productId = 2;
+}
+
+message RemoveProductFromOrderResponse {
+  string message = 1;
+}
+
+enum OrderState{
+  UNKNOWN = 0;
+  CREATED = 1;
+  PROCESSING = 2;
+  CANCELLED = 3;
+  COMPLETED = 4;
+}
+
+message UpdateOrderStateRequest {
+  int64 orderId = 1;
+  OrderState newState = 2;
+}
+
+message UpdateOrderStateResponse {
+  string message = 1;
+}
+
+message GetOrderHistoryRequest {
+  int64 orderId = 1;
+  int32 cursor = 2;
+  int32 pageSize = 3;
+}
+
+message GetFullOrderHistoryRequest {
+  int64 orderId = 1;
+}
+
+message OrderHistoryEntry {
+  int64 id = 1;
+  int64 orderId = 2;
+  google.protobuf.Timestamp changeDate = 3;
+  Payload payload = 4;
+}
+
+message Payload{
+  oneof value{
+    ItemAddedPayload itemAdded = 1;
+    ItemRemovedPayload itemRemoved= 2;
+    OrderCreatedPayload orderCreated = 3;
+    StateChangedPayload stateChanged = 4;
+  }
+}
+
+message ItemAddedPayload {
+  int64 productId = 1;
+  int32 quantity = 2;
+}
+
+message ItemRemovedPayload {
+  int64 productId = 1;
+}
+
+message OrderCreatedPayload {
+  string createdBy = 1;
+}
+
+message StateChangedPayload {
+  OrderState OldStatus = 1;
+  OrderState NewStatus = 2;
+}
